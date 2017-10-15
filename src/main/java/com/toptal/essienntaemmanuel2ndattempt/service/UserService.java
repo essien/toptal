@@ -1,6 +1,7 @@
 package com.toptal.essienntaemmanuel2ndattempt.service;
 
 import com.toptal.essienntaemmanuel2ndattempt.domain.User;
+import com.toptal.essienntaemmanuel2ndattempt.exception.DuplicateAccountException;
 import com.toptal.essienntaemmanuel2ndattempt.exception.NoSuchUserException;
 import com.toptal.essienntaemmanuel2ndattempt.repository.UserRepository;
 import java.util.Optional;
@@ -31,6 +32,11 @@ public class UserService {
     }
 
     public User save(User user) {
+        userRepository.findByEmail(user.getEmail()).ifPresent(existingUser -> {
+            if (user.getId() == null)
+                throw new DuplicateAccountException(existingUser.getEmail());
+        });
+
         final User newUser = userRepository.save(user);
         return newUser;
     }
