@@ -1,10 +1,10 @@
 package com.toptal.essienntaemmanuel2ndattempt.rest;
 
 import com.toptal.essienntaemmanuel2ndattempt.domain.Role;
-import com.toptal.essienntaemmanuel2ndattempt.domain.User;
-import com.toptal.essienntaemmanuel2ndattempt.dto.UserDto;
+import com.toptal.essienntaemmanuel2ndattempt.domain.Account;
+import com.toptal.essienntaemmanuel2ndattempt.dto.AccountDto;
 import com.toptal.essienntaemmanuel2ndattempt.exception.GenericException;
-import com.toptal.essienntaemmanuel2ndattempt.service.UserService;
+import com.toptal.essienntaemmanuel2ndattempt.service.AccountService;
 import com.toptal.essienntaemmanuel2ndattempt.service.MailSender2;
 import com.toptal.essienntaemmanuel2ndattempt.util.AuthorityUtil;
 import com.toptal.essienntaemmanuel2ndattempt.util.WebUtil;
@@ -51,76 +51,76 @@ public class AccountResource {
     @Autowired
     private MapperFacade mapperFacade;
 
-    private final UserService userService;
+    private final AccountService accountService;
     private final MailSender2 mailSender;
 
-    public AccountResource(UserService userService, MailSender2 mailSender) {
-        this.userService = userService;
+    public AccountResource(AccountService accountService, MailSender2 mailSender) {
+        this.accountService = accountService;
         this.mailSender = mailSender;
     }
 
     /**
-     * Create new user.
-     * @param userDto
+     * Create new account.
+     * @param accountDto
      * @param fields
      * @return
      */
     @PostMapping
-    public ResponseEntity<?> create(@Valid @RequestBody UserDto userDto, BindingResult fields) {
-        log.info("Received request to create user account");
-        log.debug("userDto = " + userDto);
+    public ResponseEntity<?> create(@Valid @RequestBody AccountDto accountDto, BindingResult fields) {
+        log.info("Received request to create account account");
+        log.debug("accountDto = " + accountDto);
         WebUtil.validate(fields);
 
-        userDto.setRoles(Arrays.asList(Role.USER));
-        User user = userService.saveWithToken(mapperFacade.map(userDto, User.class));
+        accountDto.setRoles(Arrays.asList(Role.USER));
+        Account account = accountService.saveWithToken(mapperFacade.map(accountDto, Account.class));
 
-        user.getVerificationToken().ifPresent(verificationToken -> {
-            String tokenLink = tokenLink(user.getEmail(), verificationToken);
+        account.getVerificationToken().ifPresent(verificationToken -> {
+            String tokenLink = tokenLink(account.getEmail(), verificationToken);
 
             log.debug("tokenLink = " + tokenLink);
 
             // Send email to verify account.
-            mailSender.sendVerificationMail(user.getEmail(), tokenLink);
+            mailSender.sendVerificationMail(account.getEmail(), tokenLink);
         });
 
-        URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{email}").buildAndExpand(user.getEmail()).toUri();
+        URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{email}").buildAndExpand(account.getEmail()).toUri();
         return ResponseEntity.created(uri).build();
     }
 
     /**
-     * Get all users
+     * Get all accounts
      * @param req
      * @return
      */
     @GetMapping
     @PreAuthorize(ADMIN_OR_MANAGER_AUTHORITY)
     public ResponseEntity<?> getAll(HttpServletRequest req) {
-        final List<User> allUsers = userService.findAll();
+        final List<Account> allAccounts = accountService.findAll();
         List<String> authorities = getAuthorities(req);
-        // Managers can CRUD only users.
+        // Managers can CRUD only accounts.
         if (authorities.contains(Role.USER_MANAGER))
-            allUsers.removeIf(user -> !hasRole(user, Role.USER));
-        return ResponseEntity.ok(mapperFacade.mapAsList(allUsers, UserDto.class));
+            allAccounts.removeIf(account -> !hasRole(account, Role.USER));
+        return ResponseEntity.ok(mapperFacade.mapAsList(allAccounts, AccountDto.class));
     }
 
-    private static boolean hasRole(User user, String role) {
-        return user.getRoles().stream().map(Role::getName).filter(x -> x.equals(role)).count() > 0;
+    private static boolean hasRole(Account account, String role) {
+        return account.getRoles().stream().map(Role::getName).filter(x -> x.equals(role)).count() > 0;
     }
 
     /**
-     * Get user by email.
+     * Get account by email.
      * @param email
      * @param req
      * @return
      */
     @GetMapping("/{email:.+}")
     @PreAuthorize(ADMIN_OR_MANAGER_AUTHORITY)
-    public ResponseEntity<?> getUser(@PathVariable String email, HttpServletRequest req) {
-        Optional<User> optUser = userService.findByEmail(email);
+    public ResponseEntity<?> getAccount(@PathVariable String email, HttpServletRequest req) {
+        Optional<Account> optAccount = accountService.findByEmail(email);
         List<String> authorities = getAuthorities(req);
-        // Managers can CRUD only users.
-        if (optUser.isPresent() && (authorities.contains(Role.ADMIN) || hasRole(optUser.get(), Role.USER))) {
-            return ResponseEntity.ok(mapperFacade.map(optUser.get(), UserDto.class));
+        // Managers can CRUD only accounts.
+        if (optAccount.isPresent() && (authorities.contains(Role.ADMIN) || hasRole(optAccount.get(), Role.USER))) {
+            return ResponseEntity.ok(mapperFacade.map(optAccount.get(), AccountDto.class));
         } else {
             return ResponseEntity.notFound().build();
         }
@@ -132,14 +132,14 @@ public class AccountResource {
     }
 
     /**
-     * Get logged-in user information.
+     * Get logged-in account information.
      * @param req
      * @return
      */
     @GetMapping("/me")
     public ResponseEntity<?> me(HttpServletRequest req) {
         String email = req.getUserPrincipal().getName();
-        return ResponseEntity.ok(mapperFacade.map(userService.findByEmail(email).get(), UserDto.class));
+        return ResponseEntity.ok(mapperFacade.map(accountService.findByEmail(email).get(), AccountDto.class));
     }
 
     /**
@@ -150,11 +150,11 @@ public class AccountResource {
     @PostMapping("/{email:.+}/sendtoken")
     @PreAuthorize(ADMIN_OR_MANAGER_AUTHORITY)
     public ResponseEntity<?> sendNewToken(@PathVariable String email) {
-        Optional<User> optUser = userService.findByEmail(email);
-        if (optUser.isPresent()) {
-            User user = optUser.get();
-            userService.saveWithToken(user);
-            mailSender.sendVerificationMail(user.getEmail(), tokenLink(user.getEmail(), user.getVerificationToken().get()));
+        Optional<Account> optAccount = accountService.findByEmail(email);
+        if (optAccount.isPresent()) {
+            Account account = optAccount.get();
+            accountService.saveWithToken(account);
+            mailSender.sendVerificationMail(account.getEmail(), tokenLink(account.getEmail(), account.getVerificationToken().get()));
             return ResponseEntity.ok().build();
         } else {
             return ResponseEntity.notFound().build();
@@ -162,17 +162,17 @@ public class AccountResource {
     }
 
     /**
-     * Unblock the user's account.
+     * Unblock the account's account.
      * @param email
      * @return
      */
     @PostMapping("/{email:.+}/unblock")
     @PreAuthorize(ADMIN_OR_MANAGER_AUTHORITY)
     public ResponseEntity<?> unblock(@PathVariable String email) {
-        Optional<User> optUser = userService.findByEmail(email);
-        if (optUser.isPresent()) {
-            User user = optUser.get();
-            userService.resetLoginAttempts(user);
+        Optional<Account> optAccount = accountService.findByEmail(email);
+        if (optAccount.isPresent()) {
+            Account account = optAccount.get();
+            accountService.resetLoginAttempts(account);
             return ResponseEntity.ok().build();
         } else {
             return ResponseEntity.notFound().build();
@@ -190,14 +190,14 @@ public class AccountResource {
         log.info("Verifying email");
         log.debug("email = " + email);
         log.debug("token = " + token);
-        Optional<User> optUser = userService.findByEmail(email);
-        if (optUser.isPresent()) {
-            User user = optUser.get();
-            if (user.getVerificationToken().isPresent()) {
-                String verificationToken = user.getVerificationToken().get();
+        Optional<Account> optAccount = accountService.findByEmail(email);
+        if (optAccount.isPresent()) {
+            Account account = optAccount.get();
+            if (account.getVerificationToken().isPresent()) {
+                String verificationToken = account.getVerificationToken().get();
                 if (verificationToken.equals(token)) {
-                    user.setVerificationToken(null);
-                    userService.save(user);
+                    account.setVerificationToken(null);
+                    accountService.save(account);
                     return ResponseEntity.ok().build();
                 } else
                     throw new GenericException("Invalid verification token");

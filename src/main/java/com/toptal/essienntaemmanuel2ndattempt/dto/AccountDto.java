@@ -10,7 +10,7 @@ import org.hibernate.validator.constraints.NotBlank;
 /**
  * @author bodmas
  */
-public class UserDto implements Serializable {
+public class AccountDto implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -26,7 +26,7 @@ public class UserDto implements Serializable {
 
     private List<String> roles = new ArrayList<>();
 
-    public UserDto() {
+    public AccountDto() {
     }
 
     public String getEmail() {

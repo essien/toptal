@@ -17,7 +17,7 @@ import javax.persistence.Id;
  * @author bodmas
  */
 @Entity
-public class User implements Serializable {
+public class Account implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -36,14 +36,14 @@ public class User implements Serializable {
     private int loginAttempts;
 
     /**
-     * If this field is null, then user has been verified. Otherwise, user will need to verify with this token.
+     * If this field is null, then account has been verified. Otherwise, account can be verified with this token.
      */
     private String verificationToken;
 
-    public User() {
+    public Account() {
     }
 
-    public User(String email, String password, String... roles) {
+    public Account(String email, String password, String... roles) {
         this.email = email;
         this.password = password;
         this.roles = Arrays.stream(roles).map(Role::new).collect(Collectors.toList());
@@ -94,7 +94,7 @@ public class User implements Serializable {
     }
 
     /**
-     * Sets the verification token. A null argument implies that the user is verified.
+     * Sets the verification token. A null argument implies that the account is verified.
      * @param verificationToken the verification token
      */
     public void setVerificationToken(String verificationToken) {
@@ -110,9 +110,9 @@ public class User implements Serializable {
 
     @Override
     public boolean equals(Object obj) {
-        if (!(obj instanceof User))
+        if (!(obj instanceof Account))
             return false;
-        final User other = (User) obj;
+        final Account other = (Account) obj;
         if (!Objects.equals(this.email, other.email))
             return false;
         return true;

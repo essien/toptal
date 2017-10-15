@@ -1,8 +1,8 @@
 package com.toptal.essienntaemmanuel2ndattempt.config;
 
 import com.toptal.essienntaemmanuel2ndattempt.domain.Role;
-import com.toptal.essienntaemmanuel2ndattempt.domain.User;
-import com.toptal.essienntaemmanuel2ndattempt.dto.UserDto;
+import com.toptal.essienntaemmanuel2ndattempt.domain.Account;
+import com.toptal.essienntaemmanuel2ndattempt.dto.AccountDto;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -36,17 +36,17 @@ public class MapperConfig {
         converterFactory.registerConverter(new PassThroughConverter(LocalDateTime.class,
                 LocalDate.class, TimeZone.class, LocalTime.class));
 
-        factory.classMap(User.class, UserDto.class)
-                .customize(new CustomMapper<User, UserDto>() {
+        factory.classMap(Account.class, AccountDto.class)
+                .customize(new CustomMapper<Account, AccountDto>() {
 
                     @Override
-                    public void mapAtoB(User a, UserDto b, MappingContext context) {
+                    public void mapAtoB(Account a, AccountDto b, MappingContext context) {
                         b.setVerified(!a.getVerificationToken().isPresent());
                         b.setRoles(a.getRoles().stream().map(Role::getName).collect(Collectors.toList()));
                     }
 
                     @Override
-                    public void mapBtoA(UserDto b, User a, MappingContext context) {
+                    public void mapBtoA(AccountDto b, Account a, MappingContext context) {
                         a.setRoles(b.getRoles().stream().map(Role::new).collect(Collectors.toList()));
                         a.setPassword(passwordEncoder.encode(b.getPassword()));
                     }

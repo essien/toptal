@@ -6,15 +6,15 @@ import org.slf4j.LoggerFactory;
 /**
  * @author bodmas
  */
-public class NoSuchUserException extends Exception {
+public class NoSuchAccountException extends Exception {
 
-    private static final Logger log = LoggerFactory.getLogger(NoSuchUserException.class);
+    private static final Logger log = LoggerFactory.getLogger(NoSuchAccountException.class);
     private static final long serialVersionUID = 1L;
 
     private String email;
 
-    public NoSuchUserException(String email) {
-        super("Unable to find user with email " + email);
+    public NoSuchAccountException(String email) {
+        super("Unable to find account with email " + email);
     }
 
     public String getEmail() {
