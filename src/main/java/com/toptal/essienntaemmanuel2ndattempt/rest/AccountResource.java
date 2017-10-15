@@ -126,6 +126,24 @@ public class AccountResource {
     }
 
     /**
+     * Unblock the user's account.
+     * @param email
+     * @return
+     */
+    @PostMapping("/{email:.+}/unblock")
+    @PreAuthorize(AuthorityUtil.HAS_ADMIN_AUTHORITY + " or " + AuthorityUtil.HAS_MANAGER_AUTHORITY)
+    public ResponseEntity<?> unblock(@PathVariable String email) {
+        Optional<User> optUser = userService.findByEmail(email);
+        if (optUser.isPresent()) {
+            User user = optUser.get();
+            userService.resetLoginAttempts(user);
+            return ResponseEntity.ok().build();
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    /**
      * Verify verification token.
      * @param email
      * @param token

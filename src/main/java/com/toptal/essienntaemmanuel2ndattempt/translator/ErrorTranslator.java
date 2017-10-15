@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -30,6 +31,14 @@ public class ErrorTranslator {
     @ResponseStatus(HttpStatus.FORBIDDEN)
     @ResponseBody
     public ResponseDto processAccessDeniedException(AccessDeniedException e) {
+        return new ResponseDto().setStatus(ResponseDto.FAIL)
+                .setMessage(e.getMessage());
+    }
+
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    @ResponseStatus(HttpStatus.METHOD_NOT_ALLOWED)
+    @ResponseBody
+    public ResponseDto processHttpRequestMethodNotSupportedException(HttpRequestMethodNotSupportedException e) {
         return new ResponseDto().setStatus(ResponseDto.FAIL)
                 .setMessage(e.getMessage());
     }
