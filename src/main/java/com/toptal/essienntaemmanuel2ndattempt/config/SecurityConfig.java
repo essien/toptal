@@ -26,7 +26,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .anyRequest().authenticated()
                 .and().formLogin()
                 .and().csrf().disable()
-                ;
+                .logout().invalidateHttpSession(true).deleteCookies("JSESSIONID");
     }
 
     @Autowired
