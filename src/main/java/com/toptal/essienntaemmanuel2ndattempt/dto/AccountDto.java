@@ -1,5 +1,6 @@
 package com.toptal.essienntaemmanuel2ndattempt.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -10,6 +11,7 @@ import org.hibernate.validator.constraints.NotBlank;
 /**
  * @author bodmas
  */
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class AccountDto implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -25,6 +27,8 @@ public class AccountDto implements Serializable {
     private boolean verified;
 
     private List<String> roles = new ArrayList<>();
+
+    private SettingsDto settings;
 
     public AccountDto() {
     }
@@ -59,5 +63,13 @@ public class AccountDto implements Serializable {
 
     public void setRoles(List<String> roles) {
         this.roles = roles;
+    }
+
+    public SettingsDto getSettings() {
+        return settings;
+    }
+
+    public void setSettings(SettingsDto settings) {
+        this.settings = settings;
     }
 }

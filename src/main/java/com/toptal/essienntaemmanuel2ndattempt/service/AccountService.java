@@ -73,4 +73,9 @@ public class AccountService {
     public List<Account> findAll() {
         return accountRepository.findAll();
     }
+
+    public void updateExpectedNumberOfCalories(String email, Long expectedNumCalories) throws NoSuchAccountException {
+        Account account = getByEmail(email);
+        account.getSettings().setExpectedNumberOfCalories(expectedNumCalories);
+    }
 }

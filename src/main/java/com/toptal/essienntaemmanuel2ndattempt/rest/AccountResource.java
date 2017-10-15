@@ -4,6 +4,7 @@ import com.toptal.essienntaemmanuel2ndattempt.domain.Role;
 import com.toptal.essienntaemmanuel2ndattempt.domain.Account;
 import com.toptal.essienntaemmanuel2ndattempt.dto.AccountDto;
 import com.toptal.essienntaemmanuel2ndattempt.exception.GenericException;
+import com.toptal.essienntaemmanuel2ndattempt.exception.NoSuchAccountException;
 import com.toptal.essienntaemmanuel2ndattempt.service.AccountService;
 import com.toptal.essienntaemmanuel2ndattempt.service.MailSender2;
 import com.toptal.essienntaemmanuel2ndattempt.util.AuthorityUtil;
@@ -212,5 +213,20 @@ public class AccountResource {
     private static String tokenLink(String email, String token) {
         return ServletUriComponentsBuilder.fromCurrentRequest().path("/{email}/verify/{token}")
                 .buildAndExpand(email, token).toUriString();
+    }
+
+    /**
+     * Set expected number of calories. Only accounts with user role can perform this action.
+     * @param email
+     * @param expectedNumCalories
+     * @return
+     * @throws NoSuchAccountException
+     */
+    @PostMapping("/{email:.+}/calories/{expectedNumCalories}")
+    @PreAuthorize(AuthorityUtil.HAS_USER_AUTHORITY)
+    public ResponseEntity<?> setExpectedCalories(@PathVariable String email, @PathVariable Long expectedNumCalories)
+            throws NoSuchAccountException {
+        accountService.updateExpectedNumberOfCalories(email, expectedNumCalories);
+        return ResponseEntity.ok().build();
     }
 }

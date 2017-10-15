@@ -6,12 +6,15 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.OneToOne;
 
 /**
  * @author bodmas
@@ -28,6 +31,7 @@ public class Account implements Serializable {
     @Column(unique = true, nullable = false, length = 100)
     private String email;
 
+    @Column(nullable = false)
     private String password;
 
     @ElementCollection(fetch = FetchType.EAGER)
@@ -39,6 +43,14 @@ public class Account implements Serializable {
      * If this field is null, then account has been verified. Otherwise, account can be verified with this token.
      */
     private String verificationToken;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(nullable = false)
+    private final Settings settings = new Settings();
+
+    Account(Long id) {
+        this.id = id;
+    }
 
     public Account() {
     }
@@ -99,6 +111,10 @@ public class Account implements Serializable {
      */
     public void setVerificationToken(String verificationToken) {
         this.verificationToken = verificationToken;
+    }
+
+    public Settings getSettings() {
+        return settings;
     }
 
     @Override

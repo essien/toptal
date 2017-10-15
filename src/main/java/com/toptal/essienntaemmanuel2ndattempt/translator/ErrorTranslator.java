@@ -1,6 +1,7 @@
 package com.toptal.essienntaemmanuel2ndattempt.translator;
 
 import com.toptal.essienntaemmanuel2ndattempt.exception.GenericException;
+import com.toptal.essienntaemmanuel2ndattempt.exception.NoSuchAccountException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -31,6 +32,14 @@ public class ErrorTranslator {
     @ResponseStatus(HttpStatus.FORBIDDEN)
     @ResponseBody
     public ResponseDto processAccessDeniedException(AccessDeniedException e) {
+        return new ResponseDto().setStatus(ResponseDto.FAIL)
+                .setMessage(e.getMessage());
+    }
+
+    @ExceptionHandler(NoSuchAccountException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    @ResponseBody
+    public ResponseDto processNoSuchAccountException(NoSuchAccountException e) {
         return new ResponseDto().setStatus(ResponseDto.FAIL)
                 .setMessage(e.getMessage());
     }
