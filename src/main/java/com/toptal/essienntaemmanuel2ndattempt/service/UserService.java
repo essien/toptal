@@ -49,10 +49,10 @@ public class UserService {
         return userRepository.count();
     }
 
-    public int incrementAndGetLoginAttempts(String email) throws NoSuchUserException {
-        User user = getByEmail(email);
+    public int incrementAndGetLoginAttempts(User user) {
         int newLoginAttempts = user.getLoginAttempts() + 1;
         user.setLoginAttempts(newLoginAttempts);
+        userRepository.save(user);
         return newLoginAttempts;
     }
 
@@ -60,9 +60,9 @@ public class UserService {
         return findByEmail(email).orElseThrow(() -> new NoSuchUserException(email));
     }
 
-    public void resetLoginAttempts(String email) throws NoSuchUserException {
-        User user = getByEmail(email);
+    public void resetLoginAttempts(User user) {
         user.setLoginAttempts(0);
+        userRepository.save(user);
     }
 
     public void generateToken(User user) {

@@ -2,7 +2,6 @@ package com.toptal.essienntaemmanuel2ndattempt.security;
 
 import com.toptal.essienntaemmanuel2ndattempt.domain.Role;
 import com.toptal.essienntaemmanuel2ndattempt.domain.User;
-import com.toptal.essienntaemmanuel2ndattempt.exception.NoSuchUserException;
 import com.toptal.essienntaemmanuel2ndattempt.service.UserService;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -43,37 +42,38 @@ public class UserAuthProvider extends DaoAuthenticationProvider {
             // User is already logged in.
             return auth;
         } else {
+            // Not logged in. Attempt login.
+            System.out.println("Not logged in");
+
+            User user = userService.findByEmail(email).orElseThrow(() -> new AuthenticationException(INVALID_CREDENTIALS) {
+            });
+
+            List<String> roles = user.getRoles().stream().map(Role::getName).collect(Collectors.toList());
+            if (roles.contains(Role.ADMIN) || roles.contains(Role.USER_MANAGER))
+                return super.authenticate(authentication);
+
+            if (user.getVerificationToken().isPresent())
+                throw new AuthenticationException("You cannot login until your account verification is complete.") {
+                };
+
+            // User. Check account blocking policy.
+            int loginAttempts = userService.incrementAndGetLoginAttempts(user);
+            if (loginAttempts > MAX_ATTEMPTS) {
+                // User has 3 failed login attempts.
+                throw new AuthenticationException(TOO_MANY_ATTEMPTS) {
+                };
+            }
             try {
-                // Not logged in. Attempt login.
-                System.out.println("Not logged in");
-                int loginAttempts = userService.incrementAndGetLoginAttempts(email);
-
-                User user = userService.findByEmail(email).get();
-                List<String> roles = user.getRoles().stream().map(Role::getName).collect(Collectors.toList());
-                if (roles.contains(Role.ADMIN) || roles.contains(Role.USER_MANAGER))
-                    return super.authenticate(authentication);
-
-                // User. Check account blocking policy.
-                if (loginAttempts > MAX_ATTEMPTS) {
-                    // User has 3 failed login attempts.
+                final Authentication result = super.authenticate(authentication);
+                userService.resetLoginAttempts(user);
+                return result;
+            } catch (AuthenticationException authenticationException) {
+                if (loginAttempts >= MAX_ATTEMPTS)
                     throw new AuthenticationException(TOO_MANY_ATTEMPTS) {
                     };
-                }
-                try {
-                    final Authentication result = super.authenticate(authentication);
-                    userService.resetLoginAttempts(email);
-                    return result;
-                } catch (AuthenticationException authenticationException) {
-                    if (loginAttempts >= MAX_ATTEMPTS)
-                        throw new AuthenticationException(TOO_MANY_ATTEMPTS) {
-                        };
-                    else
-                        throw new AuthenticationException(INVALID_CREDENTIALS) {
-                        };
-                }
-            } catch (NoSuchUserException ex) {
-                throw new AuthenticationException(INVALID_CREDENTIALS) {
-                };
+                else
+                    throw new AuthenticationException(INVALID_CREDENTIALS) {
+                    };
             }
         }
     }
