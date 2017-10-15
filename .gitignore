@@ -1,3 +1,4 @@
 target
 src/main/resources/application.properties
 src/main/resources/META-INF/spring-devtools.properties
+scripts
