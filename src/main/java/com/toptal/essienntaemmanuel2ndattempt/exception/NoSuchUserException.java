@@ -11,17 +11,17 @@ public class NoSuchUserException extends Exception {
     private static final Logger log = LoggerFactory.getLogger(NoSuchUserException.class);
     private static final long serialVersionUID = 1L;
 
-    private String username;
+    private String email;
 
-    public NoSuchUserException(String username) {
-        super("Unable to find user with username " + username);
+    public NoSuchUserException(String email) {
+        super("Unable to find user with email " + email);
     }
 
-    public String getUsername() {
-        return username;
+    public String getEmail() {
+        return email;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public void setEmail(String email) {
+        this.email = email;
     }
 }
