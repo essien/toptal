@@ -2,6 +2,8 @@ package com.toptal.essienntaemmanuel2ndattempt.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.NotBlank;
 
@@ -21,6 +23,8 @@ public class UserDto implements Serializable {
     private String password;
 
     private boolean verified;
+
+    private List<String> roles = new ArrayList<>();
 
     public UserDto() {
     }
@@ -47,5 +51,13 @@ public class UserDto implements Serializable {
 
     public void setVerified(boolean verified) {
         this.verified = verified;
+    }
+
+    public List<String> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(List<String> roles) {
+        this.roles = roles;
     }
 }

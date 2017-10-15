@@ -1,5 +1,6 @@
 package com.toptal.essienntaemmanuel2ndattempt.rest;
 
+import com.toptal.essienntaemmanuel2ndattempt.domain.Role;
 import com.toptal.essienntaemmanuel2ndattempt.domain.User;
 import com.toptal.essienntaemmanuel2ndattempt.dto.UserDto;
 import com.toptal.essienntaemmanuel2ndattempt.exception.GenericException;
@@ -7,6 +8,7 @@ import com.toptal.essienntaemmanuel2ndattempt.service.UserService;
 import com.toptal.essienntaemmanuel2ndattempt.service.MailSender2;
 import com.toptal.essienntaemmanuel2ndattempt.util.WebUtil;
 import java.net.URI;
+import java.util.Arrays;
 import java.util.Optional;
 import javax.validation.Valid;
 import ma.glasnost.orika.MapperFacade;
@@ -53,6 +55,7 @@ public class AccountResource {
         log.debug("userDto = " + userDto);
         WebUtil.validate(fields);
 
+        userDto.setRoles(Arrays.asList(Role.USER));
         User user = userService.saveWithToken(mapperFacade.map(userDto, User.class));
 
         user.getVerificationToken().ifPresent(verificationToken -> {

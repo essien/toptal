@@ -1,11 +1,13 @@
 package com.toptal.essienntaemmanuel2ndattempt.config;
 
+import com.toptal.essienntaemmanuel2ndattempt.domain.Role;
 import com.toptal.essienntaemmanuel2ndattempt.domain.User;
 import com.toptal.essienntaemmanuel2ndattempt.dto.UserDto;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.TimeZone;
+import java.util.stream.Collectors;
 import ma.glasnost.orika.CustomMapper;
 import ma.glasnost.orika.MapperFacade;
 import ma.glasnost.orika.MappingContext;
@@ -40,10 +42,12 @@ public class MapperConfig {
                     @Override
                     public void mapAtoB(User a, UserDto b, MappingContext context) {
                         b.setVerified(!a.getVerificationToken().isPresent());
+                        b.setRoles(a.getRoles().stream().map(Role::getName).collect(Collectors.toList()));
                     }
 
                     @Override
                     public void mapBtoA(UserDto b, User a, MappingContext context) {
+                        a.setRoles(b.getRoles().stream().map(Role::new).collect(Collectors.toList()));
                         a.setPassword(passwordEncoder.encode(b.getPassword()));
                     }
                 })
