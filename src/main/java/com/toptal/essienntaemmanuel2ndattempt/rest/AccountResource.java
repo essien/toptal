@@ -6,10 +6,12 @@ import com.toptal.essienntaemmanuel2ndattempt.dto.UserDto;
 import com.toptal.essienntaemmanuel2ndattempt.exception.GenericException;
 import com.toptal.essienntaemmanuel2ndattempt.service.UserService;
 import com.toptal.essienntaemmanuel2ndattempt.service.MailSender2;
+import com.toptal.essienntaemmanuel2ndattempt.util.AuthorityUtil;
 import com.toptal.essienntaemmanuel2ndattempt.util.WebUtil;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.Optional;
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import ma.glasnost.orika.MapperFacade;
 import org.slf4j.Logger;
@@ -17,6 +19,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -49,6 +52,12 @@ public class AccountResource {
         this.mailSender = mailSender;
     }
 
+    /**
+     * Create new user.
+     * @param userDto
+     * @param fields
+     * @return
+     */
     @PostMapping
     public ResponseEntity<?> create(@Valid @RequestBody UserDto userDto, BindingResult fields) {
         log.info("Received request to create user account");
@@ -71,7 +80,13 @@ public class AccountResource {
         return ResponseEntity.created(uri).build();
     }
 
+    /**
+     * Get user by email.
+     * @param email
+     * @return
+     */
     @GetMapping("/{email:.+}")
+    @PreAuthorize(AuthorityUtil.HAS_ADMIN_AUTHORITY + " or " + AuthorityUtil.HAS_MANAGER_AUTHORITY)
     public ResponseEntity<?> getUser(@PathVariable String email) {
         Optional<User> optUser = userService.findByEmail(email);
         if (optUser.isPresent()) {
@@ -81,6 +96,22 @@ public class AccountResource {
         }
     }
 
+    /**
+     * Get logged-in user information.
+     * @param req
+     * @return
+     */
+    @GetMapping("/me")
+    public ResponseEntity<?> me(HttpServletRequest req) {
+        String email = req.getUserPrincipal().getName();
+        return getUser(email);
+    }
+
+    /**
+     * Resend verification token.
+     * @param email
+     * @return
+     */
     @PostMapping("/{email:.+}/sendtoken")
     public ResponseEntity<?> sendNewToken(@PathVariable String email) {
         Optional<User> optUser = userService.findByEmail(email);
@@ -94,6 +125,12 @@ public class AccountResource {
         }
     }
 
+    /**
+     * Verify verification token.
+     * @param email
+     * @param token
+     * @return
+     */
     @GetMapping("/{email:.+}/verify/{token}")
     public ResponseEntity<?> verify(@PathVariable String email, @PathVariable String token) {
         log.info("Verifying email");
