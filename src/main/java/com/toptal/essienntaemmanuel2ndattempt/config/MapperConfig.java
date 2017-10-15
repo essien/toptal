@@ -16,6 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 /**
  * @author bodmas
@@ -26,7 +27,7 @@ public class MapperConfig {
     private static final Logger log = LoggerFactory.getLogger(MapperConfig.class);
 
     @Bean
-    public MapperFacade createMapperFacade() {
+    public MapperFacade createMapperFacade(PasswordEncoder passwordEncoder) {
         ma.glasnost.orika.MapperFactory factory = new DefaultMapperFactory.Builder().build();
 
         ConverterFactory converterFactory = factory.getConverterFactory();
@@ -39,6 +40,11 @@ public class MapperConfig {
                     @Override
                     public void mapAtoB(User a, UserDto b, MappingContext context) {
                         b.setVerified(!a.getVerificationToken().isPresent());
+                    }
+
+                    @Override
+                    public void mapBtoA(UserDto b, User a, MappingContext context) {
+                        a.setPassword(passwordEncoder.encode(b.getPassword()));
                     }
                 })
                 .byDefault().register();
