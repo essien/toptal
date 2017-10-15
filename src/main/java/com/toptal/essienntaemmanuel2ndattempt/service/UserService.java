@@ -4,6 +4,7 @@ import com.toptal.essienntaemmanuel2ndattempt.domain.User;
 import com.toptal.essienntaemmanuel2ndattempt.exception.DuplicateAccountException;
 import com.toptal.essienntaemmanuel2ndattempt.exception.NoSuchUserException;
 import com.toptal.essienntaemmanuel2ndattempt.repository.UserRepository;
+import java.util.List;
 import java.util.Optional;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
@@ -67,5 +68,9 @@ public class UserService {
 
     public void generateToken(User user) {
         user.setVerificationToken(RandomStringUtils.randomAlphanumeric(64));
+    }
+
+    public List<User> findAll() {
+        return userRepository.findAll();
     }
 }

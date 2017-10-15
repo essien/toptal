@@ -10,7 +10,9 @@ import com.toptal.essienntaemmanuel2ndattempt.util.AuthorityUtil;
 import com.toptal.essienntaemmanuel2ndattempt.util.WebUtil;
 import java.net.URI;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import ma.glasnost.orika.MapperFacade;
@@ -20,6 +22,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -40,6 +44,9 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 public class AccountResource {
 
     private static final Logger log = LoggerFactory.getLogger(AccountResource.class);
+
+    private static final String ADMIN_OR_MANAGER_AUTHORITY = AuthorityUtil.HAS_ADMIN_AUTHORITY + " or "
+            + AuthorityUtil.HAS_MANAGER_AUTHORITY;
 
     @Autowired
     private MapperFacade mapperFacade;
@@ -81,19 +88,47 @@ public class AccountResource {
     }
 
     /**
+     * Get all users
+     * @param req
+     * @return
+     */
+    @GetMapping
+    @PreAuthorize(ADMIN_OR_MANAGER_AUTHORITY)
+    public ResponseEntity<?> getAll(HttpServletRequest req) {
+        final List<User> allUsers = userService.findAll();
+        List<String> authorities = getAuthorities(req);
+        // Managers can CRUD only users.
+        if (authorities.contains(Role.USER_MANAGER))
+            allUsers.removeIf(user -> !hasRole(user, Role.USER));
+        return ResponseEntity.ok(mapperFacade.mapAsList(allUsers, UserDto.class));
+    }
+
+    private static boolean hasRole(User user, String role) {
+        return user.getRoles().stream().map(Role::getName).filter(x -> x.equals(role)).count() > 0;
+    }
+
+    /**
      * Get user by email.
      * @param email
+     * @param req
      * @return
      */
     @GetMapping("/{email:.+}")
-    @PreAuthorize(AuthorityUtil.HAS_ADMIN_AUTHORITY + " or " + AuthorityUtil.HAS_MANAGER_AUTHORITY)
-    public ResponseEntity<?> getUser(@PathVariable String email) {
+    @PreAuthorize(ADMIN_OR_MANAGER_AUTHORITY)
+    public ResponseEntity<?> getUser(@PathVariable String email, HttpServletRequest req) {
         Optional<User> optUser = userService.findByEmail(email);
-        if (optUser.isPresent()) {
+        List<String> authorities = getAuthorities(req);
+        // Managers can CRUD only users.
+        if (optUser.isPresent() && (authorities.contains(Role.ADMIN) || hasRole(optUser.get(), Role.USER))) {
             return ResponseEntity.ok(mapperFacade.map(optUser.get(), UserDto.class));
         } else {
             return ResponseEntity.notFound().build();
         }
+    }
+
+    private List<String> getAuthorities(HttpServletRequest req) {
+        UsernamePasswordAuthenticationToken principal = (UsernamePasswordAuthenticationToken) req.getUserPrincipal();
+        return principal.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList());
     }
 
     /**
@@ -104,7 +139,7 @@ public class AccountResource {
     @GetMapping("/me")
     public ResponseEntity<?> me(HttpServletRequest req) {
         String email = req.getUserPrincipal().getName();
-        return getUser(email);
+        return ResponseEntity.ok(mapperFacade.map(userService.findByEmail(email).get(), UserDto.class));
     }
 
     /**
@@ -113,6 +148,7 @@ public class AccountResource {
      * @return
      */
     @PostMapping("/{email:.+}/sendtoken")
+    @PreAuthorize(ADMIN_OR_MANAGER_AUTHORITY)
     public ResponseEntity<?> sendNewToken(@PathVariable String email) {
         Optional<User> optUser = userService.findByEmail(email);
         if (optUser.isPresent()) {
@@ -131,7 +167,7 @@ public class AccountResource {
      * @return
      */
     @PostMapping("/{email:.+}/unblock")
-    @PreAuthorize(AuthorityUtil.HAS_ADMIN_AUTHORITY + " or " + AuthorityUtil.HAS_MANAGER_AUTHORITY)
+    @PreAuthorize(ADMIN_OR_MANAGER_AUTHORITY)
     public ResponseEntity<?> unblock(@PathVariable String email) {
         Optional<User> optUser = userService.findByEmail(email);
         if (optUser.isPresent()) {
