@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -26,7 +27,7 @@ public class User implements Serializable {
     private Long id;
 
     @Column(unique = true, nullable = false, length = 100)
-    private String username;
+    private String email;
 
     private String password;
 
@@ -35,11 +36,16 @@ public class User implements Serializable {
 
     private int loginAttempts;
 
-    User() {
+    /**
+     * If this field is null, then user has been verified. Otherwise, user will need to verify with this token.
+     */
+    private String verificationToken;
+
+    public User() {
     }
 
-    public User(String username, String password, String... roles) {
-        this.username = username;
+    public User(String email, String password, String... roles) {
+        this.email = email;
         this.password = password;
         this.roles = Arrays.stream(roles).map(Role::new).collect(Collectors.toList());
     }
@@ -52,12 +58,12 @@ public class User implements Serializable {
         this.id = id;
     }
 
-    public String getUsername() {
-        return username;
+    public String getEmail() {
+        return email;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public String getPassword() {
@@ -84,10 +90,22 @@ public class User implements Serializable {
         this.loginAttempts = loginAttempts;
     }
 
+    public Optional<String> getVerificationToken() {
+        return Optional.ofNullable(verificationToken);
+    }
+
+    /**
+     * Sets the verification token. A null argument implies that the user is verified.
+     * @param verificationToken the verification token
+     */
+    public void setVerificationToken(String verificationToken) {
+        this.verificationToken = verificationToken;
+    }
+
     @Override
     public int hashCode() {
         int hash = 5;
-        hash = 97 * hash + Objects.hashCode(this.username);
+        hash = 97 * hash + Objects.hashCode(this.email);
         return hash;
     }
 
@@ -96,7 +114,7 @@ public class User implements Serializable {
         if (!(obj instanceof User))
             return false;
         final User other = (User) obj;
-        if (!Objects.equals(this.username, other.username))
+        if (!Objects.equals(this.email, other.email))
             return false;
         return true;
     }

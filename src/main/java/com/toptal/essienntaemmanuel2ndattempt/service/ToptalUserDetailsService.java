@@ -28,10 +28,10 @@ public class ToptalUserDetailsService implements UserDetailsService {
     }
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        log.debug("username = " + username);
-        Optional<User> optUser = userService.findByUsername(username);
-        final User user = optUser.orElseThrow(() -> new UsernameNotFoundException(username));
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        log.debug("email = " + email);
+        Optional<User> optUser = userService.findByEmail(email);
+        final User user = optUser.orElseThrow(() -> new UsernameNotFoundException(email));
         return new ToptalUserPrincipal(user);
     }
 

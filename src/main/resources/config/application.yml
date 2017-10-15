@@ -3,6 +3,17 @@ spring:
 #        url: jdbc:mysql://localhost:3306/toptal_db
 #        username: ${DB_USERNAME}
 #        password: ${DB_PASSWORD}
-    jpa:
-        hibernate:
-            ddl-auto: create-drop
+    mail:
+        host: ${MAIL_HOST}
+        port: ${MAIL_PORT}
+        username: ${MAIL_USERNAME}
+        password: ${MAIL_PASSWORD}
+        protocol: smtp
+        properties:
+            mail:
+                transport:
+                    protocol: smtp
+                smtp:
+                    auth: true
+                    starttls:
+                        enable: true
