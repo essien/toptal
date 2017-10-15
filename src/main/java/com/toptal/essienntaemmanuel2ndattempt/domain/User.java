@@ -6,13 +6,12 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
 
 /**
  * @author bodmas
@@ -31,7 +30,7 @@ public class User implements Serializable {
 
     private String password;
 
-    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @ElementCollection(fetch = FetchType.EAGER)
     private List<Role> roles;
 
     private int loginAttempts;
