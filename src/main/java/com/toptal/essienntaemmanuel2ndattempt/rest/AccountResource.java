@@ -9,6 +9,7 @@ import com.toptal.essienntaemmanuel2ndattempt.service.AccountService;
 import com.toptal.essienntaemmanuel2ndattempt.service.MailSender2;
 import com.toptal.essienntaemmanuel2ndattempt.util.AuthorityUtil;
 import com.toptal.essienntaemmanuel2ndattempt.util.WebUtil;
+import java.math.BigDecimal;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
@@ -213,7 +214,7 @@ public class AccountResource {
      */
     @PostMapping("/{email:.+}/settings/calories/expect/{expectedNumCalories}")
     @PreAuthorize(AuthorityUtil.HAS_USER_AUTHORITY)
-    public ResponseEntity<?> setExpectedCalories(@PathVariable String email, @PathVariable Long expectedNumCalories)
+    public ResponseEntity<?> setExpectedCalories(@PathVariable String email, @PathVariable BigDecimal expectedNumCalories)
             throws NoSuchAccountException {
         accountService.updateExpectedNumberOfCalories(email, expectedNumCalories);
         return ResponseEntity.ok().build();

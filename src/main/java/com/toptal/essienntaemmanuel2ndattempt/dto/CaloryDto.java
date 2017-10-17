@@ -8,6 +8,7 @@ import com.toptal.essienntaemmanuel2ndattempt.deserializer.LocalTimeDeserializer
 import com.toptal.essienntaemmanuel2ndattempt.serializer.LocalDateSerializer;
 import com.toptal.essienntaemmanuel2ndattempt.serializer.LocalTimeSerializer;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import javax.validation.constraints.NotNull;
@@ -30,12 +31,12 @@ public class CaloryDto implements Serializable {
     @JsonSerialize(using = LocalTimeSerializer.class)
     private LocalTime time;
 
-    @NotBlank(message = "text is a required field")
-    private String text;
+    @JsonProperty("food")
+    @NotBlank(message = "food is a required field")
+    private String foodDescription;
 
     @JsonProperty("num_of_calories")
-    @NotNull(message = "num_of_calories is a required field")
-    private Long numberOfCalories;
+    private BigDecimal numberOfCalories;
 
     @JsonProperty("calories_less_than_expected")
     private boolean caloriesLessThanExpected;
@@ -59,19 +60,19 @@ public class CaloryDto implements Serializable {
         this.time = time;
     }
 
-    public String getText() {
-        return text;
+    public String getFoodDescription() {
+        return foodDescription;
     }
 
-    public void setText(String text) {
-        this.text = text;
+    public void setFoodDescription(String foodDescription) {
+        this.foodDescription = foodDescription;
     }
 
-    public Long getNumberOfCalories() {
+    public BigDecimal getNumberOfCalories() {
         return numberOfCalories;
     }
 
-    public void setNumberOfCalories(Long numberOfCalories) {
+    public void setNumberOfCalories(BigDecimal numberOfCalories) {
         this.numberOfCalories = numberOfCalories;
     }
 

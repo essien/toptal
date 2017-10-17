@@ -3,12 +3,16 @@ package com.toptal.essienntaemmanuel2ndattempt.rest;
 import com.toptal.essienntaemmanuel2ndattempt.domain.Calory;
 import com.toptal.essienntaemmanuel2ndattempt.domain.Role;
 import com.toptal.essienntaemmanuel2ndattempt.dto.CaloryDto;
+import com.toptal.essienntaemmanuel2ndattempt.exception.MealNotFoundException;
 import com.toptal.essienntaemmanuel2ndattempt.exception.NoSuchAccountException;
+import com.toptal.essienntaemmanuel2ndattempt.nutritionix.client.CaloriesClient;
 import com.toptal.essienntaemmanuel2ndattempt.service.CaloryService;
 import com.toptal.essienntaemmanuel2ndattempt.util.AuthorityUtil;
 import com.toptal.essienntaemmanuel2ndattempt.util.WebUtil;
+import java.math.BigDecimal;
 import java.net.URI;
 import java.security.Principal;
+import java.util.List;
 import java.util.Optional;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -43,6 +47,9 @@ public class CaloryResource {
     @Autowired
     private MapperFacade mapperFacade;
 
+    @Autowired
+    private CaloriesClient caloriesClient;
+
     private final CaloryService caloryService;
 
     public CaloryResource(CaloryService caloryService) {
@@ -55,14 +62,20 @@ public class CaloryResource {
      * @param fields
      * @param principal
      * @return
+     * @throws com.toptal.essienntaemmanuel2ndattempt.exception.NoSuchAccountException
+     * @throws com.toptal.essienntaemmanuel2ndattempt.exception.MealNotFoundException
      */
-    @PostMapping("/email/{email:.+}")
+    @PostMapping
     @PreAuthorize(AuthorityUtil.HAS_USER_AUTHORITY)
     public ResponseEntity<?> create(@Valid @RequestBody CaloryDto caloryDto, BindingResult fields, Principal principal)
-            throws NoSuchAccountException {
+            throws NoSuchAccountException, MealNotFoundException {
         log.info("principal name = {}", principal.getName());
 
         WebUtil.validate(fields);
+
+        if (caloryDto.getNumberOfCalories() == null)
+            caloryDto.setNumberOfCalories(caloriesClient.getCaloriesForMeal(caloryDto.getFoodDescription()));
+
         Calory calory = caloryService.save(principal.getName(), mapperFacade.map(caloryDto, Calory.class));
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{caloryId}").buildAndExpand(calory.getId()).toUri();
         return ResponseEntity.created(uri).build();
@@ -78,5 +91,18 @@ public class CaloryResource {
         } else {
             return ResponseEntity.notFound().build();
         }
+    }
+
+    @GetMapping("/email/{email:.+}")
+    @PreAuthorize(AuthorityUtil.ADMIN_OR_MANAGER_AUTHORITY)
+    public ResponseEntity<?> findAll(@PathVariable String email) throws NoSuchAccountException {
+        List<Calory> calories = caloryService.findAll(email);
+        return ResponseEntity.ok(mapperFacade.mapAsList(calories, CaloryDto.class));
+    }
+
+    @GetMapping
+    @PreAuthorize(AuthorityUtil.HAS_USER_AUTHORITY)
+    public ResponseEntity<?> findAll(Principal principal) throws NoSuchAccountException {
+        return findAll(principal.getName());
     }
 }

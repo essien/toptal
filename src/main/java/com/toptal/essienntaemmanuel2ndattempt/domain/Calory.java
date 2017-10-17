@@ -1,6 +1,7 @@
 package com.toptal.essienntaemmanuel2ndattempt.domain;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import javax.persistence.Column;
@@ -37,7 +38,7 @@ public class Calory implements Serializable {
      * {@link #getNumberOfCalories()}
      */
     @Column(name = "num_calories", nullable = false, updatable = false)
-    private Long numberOfCalories;
+    private BigDecimal numberOfCalories;
 
     /**
      * {@link #getAccount()}
@@ -90,11 +91,11 @@ public class Calory implements Serializable {
     /**
      * @return the number of calories burned
      */
-    public Long getNumberOfCalories() {
+    public BigDecimal getNumberOfCalories() {
         return numberOfCalories;
     }
 
-    public void setNumberOfCalories(Long numberOfCalories) {
+    public void setNumberOfCalories(BigDecimal numberOfCalories) {
         this.numberOfCalories = numberOfCalories;
     }
 

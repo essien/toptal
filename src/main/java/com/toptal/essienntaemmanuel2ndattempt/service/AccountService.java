@@ -4,6 +4,7 @@ import com.toptal.essienntaemmanuel2ndattempt.domain.Account;
 import com.toptal.essienntaemmanuel2ndattempt.exception.DuplicateAccountException;
 import com.toptal.essienntaemmanuel2ndattempt.exception.NoSuchAccountException;
 import com.toptal.essienntaemmanuel2ndattempt.repository.AccountRepository;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -74,7 +75,7 @@ public class AccountService {
         return accountRepository.findAll();
     }
 
-    public void updateExpectedNumberOfCalories(String email, Long expectedNumCalories) throws NoSuchAccountException {
+    public void updateExpectedNumberOfCalories(String email, BigDecimal expectedNumCalories) throws NoSuchAccountException {
         Account account = getByEmail(email);
         account.getSettings().setExpectedNumberOfCalories(expectedNumCalories);
     }

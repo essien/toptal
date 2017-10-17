@@ -4,6 +4,8 @@ import com.toptal.essienntaemmanuel2ndattempt.domain.Account;
 import com.toptal.essienntaemmanuel2ndattempt.domain.Calory;
 import com.toptal.essienntaemmanuel2ndattempt.exception.NoSuchAccountException;
 import com.toptal.essienntaemmanuel2ndattempt.repository.CaloryRepository;
+import java.math.BigDecimal;
+import java.util.List;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,11 +33,17 @@ public class CaloryService {
     public Calory save(String email, Calory calory) throws NoSuchAccountException {
         Account account = accountService.findByEmail(email).orElseThrow(() -> new NoSuchAccountException(email));
         calory.setAccount(account);
-        calory.setCaloriesLessThanExpected(calory.getNumberOfCalories() < account.getSettings().getExpectedNumberOfCalories());
+        final BigDecimal expectedNumberOfCalories = account.getSettings().getExpectedNumberOfCalories();
+        calory.setCaloriesLessThanExpected(calory.getNumberOfCalories().compareTo(expectedNumberOfCalories) < 0);
         return caloryRepository.save(calory);
     }
 
     public Optional<Calory> findById(Long caloryId) {
         return caloryRepository.findCaloryById(caloryId);
+    }
+
+    public List<Calory> findAll(String email) throws NoSuchAccountException {
+        accountService.findByEmail(email).orElseThrow(() -> new NoSuchAccountException(email));
+        return caloryRepository.findAllByAccountEmail(email);
     }
 }
