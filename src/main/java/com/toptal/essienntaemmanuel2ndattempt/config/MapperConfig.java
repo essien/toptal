@@ -3,17 +3,22 @@ package com.toptal.essienntaemmanuel2ndattempt.config;
 import com.toptal.essienntaemmanuel2ndattempt.domain.Role;
 import com.toptal.essienntaemmanuel2ndattempt.domain.Account;
 import com.toptal.essienntaemmanuel2ndattempt.dto.AccountDto;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.ZoneId;
+import java.util.Date;
 import java.util.TimeZone;
 import java.util.stream.Collectors;
 import ma.glasnost.orika.CustomMapper;
 import ma.glasnost.orika.MapperFacade;
 import ma.glasnost.orika.MappingContext;
+import ma.glasnost.orika.converter.BidirectionalConverter;
 import ma.glasnost.orika.converter.ConverterFactory;
 import ma.glasnost.orika.converter.builtin.PassThroughConverter;
 import ma.glasnost.orika.impl.DefaultMapperFactory;
+import ma.glasnost.orika.metadata.Type;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
@@ -53,6 +58,31 @@ public class MapperConfig {
                 })
                 .byDefault().register();
 
+        converterFactory.registerConverter(new BidirectionalConverter<LocalDate, Date>() {
+
+            @Override
+            public Date convertTo(LocalDate source, Type<Date> destinationType, MappingContext mappingContext) {
+                return Date.from(source.atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
+            }
+
+            @Override
+            public LocalDate convertFrom(Date source, Type<LocalDate> destinationType, MappingContext mappingContext) {
+                return LocalDateTime.ofInstant(Instant.ofEpochMilli(source.getTime()), ZoneId.systemDefault()).toLocalDate();
+            }
+        });
+
+        converterFactory.registerConverter(new BidirectionalConverter<LocalTime, Date>() {
+
+            @Override
+            public Date convertTo(LocalTime source, Type<Date> destinationType, MappingContext mappingContext) {
+                return Date.from(source.atDate(LocalDate.now()).atZone(ZoneId.systemDefault()).toInstant());
+            }
+
+            @Override
+            public LocalTime convertFrom(Date source, Type<LocalTime> destinationType, MappingContext mappingContext) {
+                return LocalDateTime.ofInstant(Instant.ofEpochMilli(source.getTime()), ZoneId.systemDefault()).toLocalTime();
+            }
+        });
         return factory.getMapperFacade();
     }
 }

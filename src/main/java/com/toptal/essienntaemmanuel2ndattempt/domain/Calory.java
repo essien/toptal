@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -11,6 +12,8 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 /**
  * @author bodmas
@@ -25,10 +28,12 @@ public class Calory implements Serializable {
     private Long id;
 
     @Column(name = "_date", nullable = false, updatable = false) // Because SQL keyword.
-    private LocalDate date;
+    @Temporal(TemporalType.DATE)
+    private Date date;
 
     @Column(name = "_time", nullable = false, updatable = false) // Because SQL keyword.
-    private LocalTime time;
+    @Temporal(TemporalType.TIME)
+    private Date time;
 
     @Column(nullable = false, updatable = false)
     @Lob
@@ -64,19 +69,19 @@ public class Calory implements Serializable {
         this.id = id;
     }
 
-    public LocalDate getDate() {
+    public Date getDate() {
         return date;
     }
 
-    public void setDate(LocalDate date) {
+    public void setDate(Date date) {
         this.date = date;
     }
 
-    public LocalTime getTime() {
+    public Date getTime() {
         return time;
     }
 
-    public void setTime(LocalTime time) {
+    public void setTime(Date time) {
         this.time = time;
     }
 

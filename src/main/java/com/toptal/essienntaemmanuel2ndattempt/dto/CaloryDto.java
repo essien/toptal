@@ -83,4 +83,10 @@ public class CaloryDto implements Serializable {
     public void setCaloriesLessThanExpected(boolean caloriesLessThanExpected) {
         this.caloriesLessThanExpected = caloriesLessThanExpected;
     }
+
+    @Override
+    public String toString() {
+        return "CaloryDto{" + "date=" + date + ", time=" + time + ", foodDescription=" + foodDescription
+                + ", numberOfCalories=" + numberOfCalories + ", caloriesLessThanExpected=" + caloriesLessThanExpected + '}';
+    }
 }

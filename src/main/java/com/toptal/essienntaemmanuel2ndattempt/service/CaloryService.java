@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -45,5 +47,10 @@ public class CaloryService {
     public List<Calory> findAll(String email) throws NoSuchAccountException {
         accountService.findByEmail(email).orElseThrow(() -> new NoSuchAccountException(email));
         return caloryRepository.findAllByAccountEmail(email);
+    }
+
+    public List<Calory> findAll(String email, int offset, int size) throws NoSuchAccountException {
+        accountService.findByEmail(email).orElseThrow(() -> new NoSuchAccountException(email));
+        return caloryRepository.findAllByAccountEmail(email, new PageRequest(offset, size, Sort.Direction.ASC, "id"));
     }
 }

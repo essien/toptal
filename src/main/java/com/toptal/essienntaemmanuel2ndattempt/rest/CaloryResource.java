@@ -29,6 +29,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -100,9 +101,24 @@ public class CaloryResource {
         return ResponseEntity.ok(mapperFacade.mapAsList(calories, CaloryDto.class));
     }
 
+    @GetMapping(value = "/email/{email:.+}", params = {"page", "size"})
+    @PreAuthorize(AuthorityUtil.ADMIN_OR_MANAGER_AUTHORITY)
+    public ResponseEntity<?> findAll(@PathVariable String email, @RequestParam int page, @RequestParam int size)
+            throws NoSuchAccountException {
+        List<Calory> calories = caloryService.findAll(email, page, size);
+        return ResponseEntity.ok(mapperFacade.mapAsList(calories, CaloryDto.class));
+    }
+
     @GetMapping
     @PreAuthorize(AuthorityUtil.HAS_USER_AUTHORITY)
     public ResponseEntity<?> findAll(Principal principal) throws NoSuchAccountException {
         return findAll(principal.getName());
+    }
+
+    @GetMapping(params = {"page", "size"})
+    @PreAuthorize(AuthorityUtil.HAS_USER_AUTHORITY)
+    public ResponseEntity<?> findAll(@RequestParam int page, @RequestParam int size, Principal principal)
+            throws NoSuchAccountException {
+        return findAll(principal.getName(), page, size);
     }
 }
