@@ -1,8 +1,13 @@
 package com.toptal.essienntaemmanuel2ndattempt.util;
 
 import com.toptal.essienntaemmanuel2ndattempt.exception.GenericException;
+import java.util.List;
+import java.util.stream.Collectors;
+import javax.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 
@@ -25,5 +30,10 @@ public class WebUtil {
                 throw new GenericException("field errors: " + fieldError, fieldError.getDefaultMessage());
             }
         }
+    }
+
+    public static List<String> getAuthorities(HttpServletRequest req) {
+        UsernamePasswordAuthenticationToken principal = (UsernamePasswordAuthenticationToken) req.getUserPrincipal();
+        return principal.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList());
     }
 }

@@ -13,7 +13,6 @@ import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import ma.glasnost.orika.MapperFacade;
@@ -23,8 +22,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -45,9 +42,6 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 public class AccountResource {
 
     private static final Logger log = LoggerFactory.getLogger(AccountResource.class);
-
-    private static final String ADMIN_OR_MANAGER_AUTHORITY = AuthorityUtil.HAS_ADMIN_AUTHORITY + " or "
-            + AuthorityUtil.HAS_MANAGER_AUTHORITY;
 
     @Autowired
     private MapperFacade mapperFacade;
@@ -94,11 +88,11 @@ public class AccountResource {
      * @return
      */
     @GetMapping
-    @PreAuthorize(ADMIN_OR_MANAGER_AUTHORITY)
+    @PreAuthorize(AuthorityUtil.ADMIN_OR_MANAGER_AUTHORITY)
     public ResponseEntity<?> getAll(HttpServletRequest req) {
         final List<Account> allAccounts = accountService.findAll();
-        List<String> authorities = getAuthorities(req);
-        // Managers can CRUD only accounts.
+        List<String> authorities = WebUtil.getAuthorities(req);
+        // Managers can CRUD only users.
         if (authorities.contains(Role.USER_MANAGER))
             allAccounts.removeIf(account -> !hasRole(account, Role.USER));
         return ResponseEntity.ok(mapperFacade.mapAsList(allAccounts, AccountDto.class));
@@ -115,21 +109,16 @@ public class AccountResource {
      * @return
      */
     @GetMapping("/{email:.+}")
-    @PreAuthorize(ADMIN_OR_MANAGER_AUTHORITY)
+    @PreAuthorize(AuthorityUtil.ADMIN_OR_MANAGER_AUTHORITY)
     public ResponseEntity<?> getAccount(@PathVariable String email, HttpServletRequest req) {
         Optional<Account> optAccount = accountService.findByEmail(email);
-        List<String> authorities = getAuthorities(req);
-        // Managers can CRUD only accounts.
+        List<String> authorities = WebUtil.getAuthorities(req);
+        // Managers can CRUD only users.
         if (optAccount.isPresent() && (authorities.contains(Role.ADMIN) || hasRole(optAccount.get(), Role.USER))) {
             return ResponseEntity.ok(mapperFacade.map(optAccount.get(), AccountDto.class));
         } else {
             return ResponseEntity.notFound().build();
         }
-    }
-
-    private List<String> getAuthorities(HttpServletRequest req) {
-        UsernamePasswordAuthenticationToken principal = (UsernamePasswordAuthenticationToken) req.getUserPrincipal();
-        return principal.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList());
     }
 
     /**
@@ -149,7 +138,7 @@ public class AccountResource {
      * @return
      */
     @PostMapping("/{email:.+}/sendtoken")
-    @PreAuthorize(ADMIN_OR_MANAGER_AUTHORITY)
+    @PreAuthorize(AuthorityUtil.ADMIN_OR_MANAGER_AUTHORITY)
     public ResponseEntity<?> sendNewToken(@PathVariable String email) {
         Optional<Account> optAccount = accountService.findByEmail(email);
         if (optAccount.isPresent()) {
@@ -168,7 +157,7 @@ public class AccountResource {
      * @return
      */
     @PostMapping("/{email:.+}/unblock")
-    @PreAuthorize(ADMIN_OR_MANAGER_AUTHORITY)
+    @PreAuthorize(AuthorityUtil.ADMIN_OR_MANAGER_AUTHORITY)
     public ResponseEntity<?> unblock(@PathVariable String email) {
         Optional<Account> optAccount = accountService.findByEmail(email);
         if (optAccount.isPresent()) {
@@ -222,7 +211,7 @@ public class AccountResource {
      * @return
      * @throws NoSuchAccountException
      */
-    @PostMapping("/{email:.+}/calories/{expectedNumCalories}")
+    @PostMapping("/{email:.+}/settings/calories/expect/{expectedNumCalories}")
     @PreAuthorize(AuthorityUtil.HAS_USER_AUTHORITY)
     public ResponseEntity<?> setExpectedCalories(@PathVariable String email, @PathVariable Long expectedNumCalories)
             throws NoSuchAccountException {
