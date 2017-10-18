@@ -29,6 +29,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -92,6 +93,24 @@ public class AccountResource {
     @PreAuthorize(AuthorityUtil.ADMIN_OR_MANAGER_AUTHORITY)
     public ResponseEntity<?> getAll(HttpServletRequest req) {
         final List<Account> allAccounts = accountService.findAll();
+        List<String> authorities = WebUtil.getAuthorities(req);
+        // Managers can CRUD only users.
+        if (authorities.contains(Role.USER_MANAGER))
+            allAccounts.removeIf(account -> !hasRole(account, Role.USER));
+        return ResponseEntity.ok(mapperFacade.mapAsList(allAccounts, AccountDto.class));
+    }
+
+    /**
+     * Get all accounts
+     * @param page
+     * @param size
+     * @param req
+     * @return
+     */
+    @GetMapping(params = {"page", "size"})
+    @PreAuthorize(AuthorityUtil.ADMIN_OR_MANAGER_AUTHORITY)
+    public ResponseEntity<?> getAll(@RequestParam int page, @RequestParam int size, HttpServletRequest req) {
+        final List<Account> allAccounts = accountService.findAll(page, size);
         List<String> authorities = WebUtil.getAuthorities(req);
         // Managers can CRUD only users.
         if (authorities.contains(Role.USER_MANAGER))

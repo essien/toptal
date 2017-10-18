@@ -4,12 +4,14 @@ import com.toptal.essienntaemmanuel2ndattempt.domain.Account;
 import com.toptal.essienntaemmanuel2ndattempt.exception.DuplicateAccountException;
 import com.toptal.essienntaemmanuel2ndattempt.exception.NoSuchAccountException;
 import com.toptal.essienntaemmanuel2ndattempt.repository.AccountRepository;
+import com.toptal.essienntaemmanuel2ndattempt.repository.misc.PageRequestImpl;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -73,6 +75,10 @@ public class AccountService {
 
     public List<Account> findAll() {
         return accountRepository.findAll();
+    }
+
+    public List<Account> findAll(int offset, int size) {
+        return accountRepository.findAccountsBy(new PageRequestImpl(offset, size, Sort.Direction.ASC, "id"));
     }
 
     public void updateExpectedNumberOfCalories(String email, BigDecimal expectedNumCalories) throws NoSuchAccountException {
