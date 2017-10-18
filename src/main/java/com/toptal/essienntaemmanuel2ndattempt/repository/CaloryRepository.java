@@ -11,7 +11,7 @@ import org.springframework.stereotype.Repository;
  * @author bodmas
  */
 @Repository
-public interface CaloryRepository extends JpaRepository<Calory, Long> {
+public interface CaloryRepository extends JpaRepository<Calory, Long>, CaloryRepositoryCustom {
 
     Optional<Calory> findCaloryById(Long caloryId);
 

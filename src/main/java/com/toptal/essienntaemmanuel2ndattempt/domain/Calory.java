@@ -2,15 +2,12 @@ package com.toptal.essienntaemmanuel2ndattempt.domain;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.Lob;
 import javax.persistence.ManyToOne;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -36,8 +33,7 @@ public class Calory implements Serializable {
     private Date time;
 
     @Column(nullable = false, updatable = false)
-    @Lob
-    private String foodDescription;
+    private String food;
 
     /**
      * {@link #getNumberOfCalories()}
@@ -85,12 +81,12 @@ public class Calory implements Serializable {
         this.time = time;
     }
 
-    public String getFoodDescription() {
-        return foodDescription;
+    public String getFood() {
+        return food;
     }
 
-    public void setFoodDescription(String foodDescription) {
-        this.foodDescription = foodDescription;
+    public void setFood(String food) {
+        this.food = food;
     }
 
     /**
@@ -129,7 +125,7 @@ public class Calory implements Serializable {
 
     @Override
     public String toString() {
-        return "Calory{" + "id=" + id + ", date=" + date + ", time=" + time + ", text=" + foodDescription
+        return "Calory{" + "id=" + id + ", date=" + date + ", time=" + time + ", text=" + food
                 + ", numberOfCalories=" + numberOfCalories + '}';
     }
 }

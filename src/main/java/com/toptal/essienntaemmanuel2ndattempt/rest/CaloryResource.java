@@ -75,7 +75,7 @@ public class CaloryResource {
         WebUtil.validate(fields);
 
         if (caloryDto.getNumberOfCalories() == null)
-            caloryDto.setNumberOfCalories(caloriesClient.getCaloriesForMeal(caloryDto.getFoodDescription()));
+            caloryDto.setNumberOfCalories(caloriesClient.getCaloriesForMeal(caloryDto.getFood()));
 
         Calory calory = caloryService.save(principal.getName(), mapperFacade.map(caloryDto, Calory.class));
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{caloryId}").buildAndExpand(calory.getId()).toUri();
@@ -115,10 +115,39 @@ public class CaloryResource {
         return findAll(principal.getName());
     }
 
+    @GetMapping(params = {"q"})
+    @PreAuthorize(AuthorityUtil.HAS_USER_AUTHORITY)
+    public ResponseEntity<?> findAll(Principal principal, @RequestParam("q") String query) throws NoSuchAccountException {
+        return findAll(principal.getName(), query);
+    }
+
     @GetMapping(params = {"page", "size"})
     @PreAuthorize(AuthorityUtil.HAS_USER_AUTHORITY)
     public ResponseEntity<?> findAll(@RequestParam int page, @RequestParam int size, Principal principal)
             throws NoSuchAccountException {
         return findAll(principal.getName(), page, size);
+    }
+
+    @GetMapping(value = "/email/{email:.+}", params = {"q"})
+    @PreAuthorize(AuthorityUtil.ADMIN_OR_MANAGER_AUTHORITY)
+    public ResponseEntity<?> findAll(@PathVariable String email, @RequestParam("q") String query) throws NoSuchAccountException {
+        log.debug("query = " + query);
+        List<Calory> calories = caloryService.findAll(email, query);
+        return ResponseEntity.ok(mapperFacade.mapAsList(calories, CaloryDto.class));
+    }
+
+    @GetMapping(value = "/email/{email:.+}", params = {"q", "page", "size"})
+    @PreAuthorize(AuthorityUtil.ADMIN_OR_MANAGER_AUTHORITY)
+    public ResponseEntity<?> findAll(@PathVariable String email, @RequestParam String q, @RequestParam int page,
+            @RequestParam int size) throws NoSuchAccountException {
+        List<Calory> calories = caloryService.findAll(email, q, page, size);
+        return ResponseEntity.ok(mapperFacade.mapAsList(calories, CaloryDto.class));
+    }
+
+    @GetMapping(params = {"q", "page", "size"})
+    @PreAuthorize(AuthorityUtil.HAS_USER_AUTHORITY)
+    public ResponseEntity<?> findAll(@RequestParam String q, @RequestParam int page, @RequestParam int size, Principal principal)
+            throws NoSuchAccountException {
+        return findAll(principal.getName(), q, page, size);
     }
 }

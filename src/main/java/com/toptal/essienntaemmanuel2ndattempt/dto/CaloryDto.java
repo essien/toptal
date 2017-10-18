@@ -33,12 +33,12 @@ public class CaloryDto implements Serializable {
 
     @JsonProperty("food")
     @NotBlank(message = "food is a required field")
-    private String foodDescription;
+    private String food;
 
-    @JsonProperty("num_of_calories")
+    @JsonProperty("num_calories")
     private BigDecimal numberOfCalories;
 
-    @JsonProperty("calories_less_than_expected")
+    @JsonProperty("less_than_expected")
     private boolean caloriesLessThanExpected;
 
     public CaloryDto() {
@@ -60,12 +60,12 @@ public class CaloryDto implements Serializable {
         this.time = time;
     }
 
-    public String getFoodDescription() {
-        return foodDescription;
+    public String getFood() {
+        return food;
     }
 
-    public void setFoodDescription(String foodDescription) {
-        this.foodDescription = foodDescription;
+    public void setFood(String food) {
+        this.food = food;
     }
 
     public BigDecimal getNumberOfCalories() {
@@ -86,7 +86,7 @@ public class CaloryDto implements Serializable {
 
     @Override
     public String toString() {
-        return "CaloryDto{" + "date=" + date + ", time=" + time + ", foodDescription=" + foodDescription
+        return "CaloryDto{" + "date=" + date + ", time=" + time + ", foodDescription=" + food
                 + ", numberOfCalories=" + numberOfCalories + ", caloriesLessThanExpected=" + caloriesLessThanExpected + '}';
     }
 }

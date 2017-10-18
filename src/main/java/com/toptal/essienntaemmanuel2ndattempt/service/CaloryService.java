@@ -4,12 +4,13 @@ import com.toptal.essienntaemmanuel2ndattempt.domain.Account;
 import com.toptal.essienntaemmanuel2ndattempt.domain.Calory;
 import com.toptal.essienntaemmanuel2ndattempt.exception.NoSuchAccountException;
 import com.toptal.essienntaemmanuel2ndattempt.repository.CaloryRepository;
+import com.toptal.essienntaemmanuel2ndattempt.repository.misc.PageRequestImpl;
+import com.toptal.essienntaemmanuel2ndattempt.repository.misc.QueryAnalyzer;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -50,7 +51,22 @@ public class CaloryService {
     }
 
     public List<Calory> findAll(String email, int offset, int size) throws NoSuchAccountException {
+        log.info("Finding all");
+        log.debug("offset = " + offset);
+        log.debug("size = " + size);
         accountService.findByEmail(email).orElseThrow(() -> new NoSuchAccountException(email));
-        return caloryRepository.findAllByAccountEmail(email, new PageRequest(offset, size, Sort.Direction.ASC, "id"));
+        return caloryRepository.findAllByAccountEmail(email, new PageRequestImpl(offset, size, Sort.Direction.ASC, "id"));
+    }
+
+    public List<Calory> findAll(String email, String query) throws NoSuchAccountException {
+        query = QueryAnalyzer.clean(query);
+        accountService.findByEmail(email).orElseThrow(() -> new NoSuchAccountException(email));
+        return caloryRepository.findByCustomQuery(email, query);
+    }
+
+    public List<Calory> findAll(String email, String query, int offset, int size) throws NoSuchAccountException {
+        query = QueryAnalyzer.clean(query);
+        accountService.findByEmail(email).orElseThrow(() -> new NoSuchAccountException(email));
+        return caloryRepository.findByCustomQuery(email, query, offset, size);
     }
 }
