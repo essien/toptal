@@ -1,5 +1,6 @@
 package com.toptal.essienntaemmanuel2ndattempt.translator;
 
+import com.toptal.essienntaemmanuel2ndattempt.dto.ResponseDto;
 import com.toptal.essienntaemmanuel2ndattempt.exception.GenericException;
 import com.toptal.essienntaemmanuel2ndattempt.exception.MealNotFoundException;
 import com.toptal.essienntaemmanuel2ndattempt.exception.NoSuchAccountException;

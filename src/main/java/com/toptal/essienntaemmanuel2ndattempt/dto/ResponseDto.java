@@ -1,4 +1,4 @@
-package com.toptal.essienntaemmanuel2ndattempt.translator;
+package com.toptal.essienntaemmanuel2ndattempt.dto;
 
 import java.io.Serializable;
 import org.slf4j.Logger;
