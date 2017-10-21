@@ -1,8 +1,9 @@
-package com.toptal.essienntaemmanuel2ndattempt.nutritionix.client;
+package com.toptal.essienntaemmanuel2ndattempt.calories.nutritionix.client;
 
 import com.toptal.essienntaemmanuel2ndattempt.exception.MealNotFoundException;
-import com.toptal.essienntaemmanuel2ndattempt.nutritionix.ApiRequest;
-import com.toptal.essienntaemmanuel2ndattempt.nutritionix.ApiResponse;
+import com.toptal.essienntaemmanuel2ndattempt.calories.nutritionix.ApiRequest;
+import com.toptal.essienntaemmanuel2ndattempt.calories.nutritionix.ApiResponse;
+import com.toptal.essienntaemmanuel2ndattempt.calories.client.CaloriesClient;
 import java.math.BigDecimal;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,19 +19,20 @@ import org.springframework.web.client.RestTemplate;
  * @author bodmas
  */
 @Service
-public class CaloriesClient {
+public class NutritionixCaloriesClient implements CaloriesClient {
 
-    private static final Logger log = LoggerFactory.getLogger(CaloriesClient.class);
+    private static final Logger log = LoggerFactory.getLogger(NutritionixCaloriesClient.class);
 
     private static final String ERROR_MESSAGE = "Something went wrong. Please try again later";
     private static final String REQUEST_URL = "https://www.nutritionix.com/track-api/v2/natural/nutrients";
 
     private final RestTemplate restTemplate;
 
-    public CaloriesClient(RestTemplate restTemplate) {
+    public NutritionixCaloriesClient(RestTemplate restTemplate) {
         this.restTemplate = restTemplate;
     }
 
+    @Override
     public BigDecimal getCaloriesForMeal(String mealDescription) throws MealNotFoundException {
         log.info("Retrieving calories for meal " + mealDescription);
         HttpHeaders httpHeaders = new HttpHeaders();

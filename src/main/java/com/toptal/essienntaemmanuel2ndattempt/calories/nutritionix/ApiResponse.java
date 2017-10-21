@@ -1,4 +1,4 @@
-package com.toptal.essienntaemmanuel2ndattempt.nutritionix;
+package com.toptal.essienntaemmanuel2ndattempt.calories.nutritionix;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.io.Serializable;

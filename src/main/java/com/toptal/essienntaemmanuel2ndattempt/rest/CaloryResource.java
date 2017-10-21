@@ -1,11 +1,11 @@
 package com.toptal.essienntaemmanuel2ndattempt.rest;
 
+import com.toptal.essienntaemmanuel2ndattempt.calories.client.CaloriesClient;
 import com.toptal.essienntaemmanuel2ndattempt.domain.Calory;
 import com.toptal.essienntaemmanuel2ndattempt.domain.Role;
 import com.toptal.essienntaemmanuel2ndattempt.dto.CaloryDto;
 import com.toptal.essienntaemmanuel2ndattempt.exception.MealNotFoundException;
 import com.toptal.essienntaemmanuel2ndattempt.exception.NoSuchAccountException;
-import com.toptal.essienntaemmanuel2ndattempt.nutritionix.client.CaloriesClient;
 import com.toptal.essienntaemmanuel2ndattempt.service.api.CaloryService;
 import com.toptal.essienntaemmanuel2ndattempt.util.AuthorityUtil;
 import com.toptal.essienntaemmanuel2ndattempt.util.WebUtil;
