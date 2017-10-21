@@ -5,8 +5,8 @@ import com.toptal.essienntaemmanuel2ndattempt.domain.Account;
 import com.toptal.essienntaemmanuel2ndattempt.dto.AccountDto;
 import com.toptal.essienntaemmanuel2ndattempt.exception.GenericException;
 import com.toptal.essienntaemmanuel2ndattempt.exception.NoSuchAccountException;
-import com.toptal.essienntaemmanuel2ndattempt.service.AccountService;
-import com.toptal.essienntaemmanuel2ndattempt.service.MailSender2;
+import com.toptal.essienntaemmanuel2ndattempt.service.api.AccountService;
+import com.toptal.essienntaemmanuel2ndattempt.service.impl.MailSender2;
 import com.toptal.essienntaemmanuel2ndattempt.util.AuthorityUtil;
 import com.toptal.essienntaemmanuel2ndattempt.util.WebUtil;
 import java.math.BigDecimal;
@@ -175,18 +175,13 @@ public class AccountResource {
      * Unblock the account's account.
      * @param email
      * @return
+     * @throws com.toptal.essienntaemmanuel2ndattempt.exception.NoSuchAccountException
      */
     @PostMapping("/{email:.+}/unblock")
     @PreAuthorize(AuthorityUtil.ADMIN_OR_MANAGER_AUTHORITY)
-    public ResponseEntity<?> unblock(@PathVariable String email) {
-        Optional<Account> optAccount = accountService.findByEmail(email);
-        if (optAccount.isPresent()) {
-            Account account = optAccount.get();
-            accountService.resetLoginAttempts(account);
-            return ResponseEntity.ok().build();
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+    public ResponseEntity<?> unblock(@PathVariable String email) throws NoSuchAccountException {
+        accountService.resetLoginAttempts(email);
+        return ResponseEntity.ok().build();
     }
 
     /**

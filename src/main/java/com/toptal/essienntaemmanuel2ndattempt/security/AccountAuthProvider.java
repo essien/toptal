@@ -2,7 +2,8 @@ package com.toptal.essienntaemmanuel2ndattempt.security;
 
 import com.toptal.essienntaemmanuel2ndattempt.domain.Role;
 import com.toptal.essienntaemmanuel2ndattempt.domain.Account;
-import com.toptal.essienntaemmanuel2ndattempt.service.AccountService;
+import com.toptal.essienntaemmanuel2ndattempt.exception.NoSuchAccountException;
+import com.toptal.essienntaemmanuel2ndattempt.service.api.AccountService;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
@@ -57,24 +58,28 @@ public class AccountAuthProvider extends DaoAuthenticationProvider {
                 throw new AuthenticationException("You cannot login until your account verification is complete.") {
                 };
 
-            // Account. Check account blocking policy.
-            int loginAttempts = accountService.incrementAndGetLoginAttempts(account);
-            if (loginAttempts > MAX_ATTEMPTS) {
-                // Account has 3 failed login attempts.
-                throw new AuthenticationException(TOO_MANY_ATTEMPTS) {
-                };
-            }
             try {
-                final Authentication result = super.authenticate(authentication);
-                accountService.resetLoginAttempts(account);
-                return result;
-            } catch (AuthenticationException authenticationException) {
-                if (loginAttempts >= MAX_ATTEMPTS)
+                // Account. Check account blocking policy.
+                int loginAttempts = accountService.incrementAndGetLoginAttempts(email);
+                if (loginAttempts > MAX_ATTEMPTS) {
+                    // Account has 3 failed login attempts.
                     throw new AuthenticationException(TOO_MANY_ATTEMPTS) {
                     };
-                else
-                    throw new AuthenticationException(INVALID_CREDENTIALS) {
-                    };
+                }
+                try {
+                    final Authentication result = super.authenticate(authentication);
+                    accountService.resetLoginAttempts(email);
+                    return result;
+                } catch (AuthenticationException authenticationException) {
+                    if (loginAttempts >= MAX_ATTEMPTS)
+                        throw new AuthenticationException(TOO_MANY_ATTEMPTS, authenticationException) {
+                        };
+                    else
+                        throw new AuthenticationException(INVALID_CREDENTIALS, authenticationException) {
+                        };
+                }
+            } catch (NoSuchAccountException ex) {
+                throw new RuntimeException("This exception should never be thrown in this context", ex);
             }
         }
     }

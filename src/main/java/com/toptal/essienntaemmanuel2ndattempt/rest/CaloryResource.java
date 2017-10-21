@@ -6,7 +6,7 @@ import com.toptal.essienntaemmanuel2ndattempt.dto.CaloryDto;
 import com.toptal.essienntaemmanuel2ndattempt.exception.MealNotFoundException;
 import com.toptal.essienntaemmanuel2ndattempt.exception.NoSuchAccountException;
 import com.toptal.essienntaemmanuel2ndattempt.nutritionix.client.CaloriesClient;
-import com.toptal.essienntaemmanuel2ndattempt.service.CaloryService;
+import com.toptal.essienntaemmanuel2ndattempt.service.impl.CaloryService;
 import com.toptal.essienntaemmanuel2ndattempt.util.AuthorityUtil;
 import com.toptal.essienntaemmanuel2ndattempt.util.WebUtil;
 import java.math.BigDecimal;

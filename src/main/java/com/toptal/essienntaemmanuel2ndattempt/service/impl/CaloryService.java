@@ -1,4 +1,4 @@
-package com.toptal.essienntaemmanuel2ndattempt.service;
+package com.toptal.essienntaemmanuel2ndattempt.service.impl;
 
 import com.toptal.essienntaemmanuel2ndattempt.domain.Account;
 import com.toptal.essienntaemmanuel2ndattempt.domain.Calory;
@@ -26,9 +26,9 @@ public class CaloryService {
     private static final Logger log = LoggerFactory.getLogger(CaloryService.class);
 
     private final CaloryRepository caloryRepository;
-    private final AccountService accountService;
+    private final AccountServiceImpl accountService;
 
-    public CaloryService(CaloryRepository caloryRepository, AccountService accountService) {
+    public CaloryService(CaloryRepository caloryRepository, AccountServiceImpl accountService) {
         this.caloryRepository = caloryRepository;
         this.accountService = accountService;
     }

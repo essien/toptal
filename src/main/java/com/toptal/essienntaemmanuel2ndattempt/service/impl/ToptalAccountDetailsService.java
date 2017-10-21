@@ -1,4 +1,4 @@
-package com.toptal.essienntaemmanuel2ndattempt.service;
+package com.toptal.essienntaemmanuel2ndattempt.service.impl;
 
 import com.toptal.essienntaemmanuel2ndattempt.domain.Role;
 import com.toptal.essienntaemmanuel2ndattempt.domain.Account;
@@ -20,9 +20,9 @@ public class ToptalAccountDetailsService implements UserDetailsService {
 
     private static final Logger log = LoggerFactory.getLogger(ToptalAccountDetailsService.class);
 
-    private final AccountService accountService;
+    private final AccountServiceImpl accountService;
 
-    public ToptalAccountDetailsService(AccountService accountService, PasswordEncoder passwordEncoder) {
+    public ToptalAccountDetailsService(AccountServiceImpl accountService, PasswordEncoder passwordEncoder) {
         this.accountService = accountService;
         createDefaultAccountsIfAbsent(accountService, passwordEncoder);
     }
@@ -35,7 +35,7 @@ public class ToptalAccountDetailsService implements UserDetailsService {
         return new ToptalAccountPrincipal(account);
     }
 
-    private void createDefaultAccountsIfAbsent(AccountService accountService, PasswordEncoder passwordEncoder) {
+    private void createDefaultAccountsIfAbsent(AccountServiceImpl accountService, PasswordEncoder passwordEncoder) {
         if (accountService.count() == 0) {
             accountService.save(new Account("admin", passwordEncoder.encode("admin"), Role.ADMIN));
             accountService.save(new Account("manager", passwordEncoder.encode("manager"), Role.USER_MANAGER));

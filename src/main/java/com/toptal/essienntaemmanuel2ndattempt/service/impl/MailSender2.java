@@ -1,4 +1,4 @@
-package com.toptal.essienntaemmanuel2ndattempt.service;
+package com.toptal.essienntaemmanuel2ndattempt.service.impl;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
