@@ -16,13 +16,13 @@ import org.springframework.stereotype.Service;
  * @author bodmas
  */
 @Service
-public class ToptalAccountDetailsService implements UserDetailsService {
+public class UserDetailsServiceImpl implements UserDetailsService {
 
-    private static final Logger log = LoggerFactory.getLogger(ToptalAccountDetailsService.class);
+    private static final Logger log = LoggerFactory.getLogger(UserDetailsServiceImpl.class);
 
     private final AccountServiceImpl accountService;
 
-    public ToptalAccountDetailsService(AccountServiceImpl accountService, PasswordEncoder passwordEncoder) {
+    public UserDetailsServiceImpl(AccountServiceImpl accountService, PasswordEncoder passwordEncoder) {
         this.accountService = accountService;
         createDefaultAccountsIfAbsent(accountService, passwordEncoder);
     }
