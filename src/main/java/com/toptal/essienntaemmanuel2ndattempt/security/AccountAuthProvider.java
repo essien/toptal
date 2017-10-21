@@ -79,7 +79,7 @@ public class AccountAuthProvider extends DaoAuthenticationProvider {
                         };
                 }
             } catch (NoSuchAccountException ex) {
-                throw new RuntimeException("This exception should never be thrown in this context", ex);
+                throw new AssertionError("This exception should never be thrown in this context", ex);
             }
         }
     }
