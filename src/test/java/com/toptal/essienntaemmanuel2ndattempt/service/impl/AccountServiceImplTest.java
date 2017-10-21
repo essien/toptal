@@ -2,6 +2,7 @@ package com.toptal.essienntaemmanuel2ndattempt.service.impl;
 
 import com.toptal.essienntaemmanuel2ndattempt.domain.Account;
 import com.toptal.essienntaemmanuel2ndattempt.exception.DuplicateAccountException;
+import com.toptal.essienntaemmanuel2ndattempt.exception.NoSuchAccountException;
 import com.toptal.essienntaemmanuel2ndattempt.repository.AccountRepository;
 import java.math.BigDecimal;
 import java.util.Arrays;
@@ -123,8 +124,19 @@ public class AccountServiceImplTest {
     }
 
     @Test
-    public void incrementAndGetLoginAttemptsShouldReturnExpectedResult() throws Exception {
+    public void incrementAndGetLoginAttemptsWhenAccountNotFoundShouldThrowException() throws Exception {
+        String email = RandomStringUtils.randomAlphabetic(10);
 
+        given(accountRepository.findByEmail(anyString())).willReturn(Optional.empty());
+
+        thrown.expect(NoSuchAccountException.class);
+        thrown.expectMessage("Unable to find account with email " + email);
+
+        accountService.incrementAndGetLoginAttempts(email);
+    }
+
+    @Test
+    public void incrementAndGetLoginAttemptsShouldReturnExpectedResult() throws Exception {
         String email = RandomStringUtils.randomAlphabetic(10);
         final int initialLoginCount = (int) (Math.random() * (Integer.MAX_VALUE - 1));
         final Account account = new Account();
@@ -139,7 +151,6 @@ public class AccountServiceImplTest {
 
     @Test
     public void resetLoginAttemptsShouldResetLoginAttempts() throws Exception {
-
         String email = RandomStringUtils.randomAlphabetic(10);
         final int initialLoginCount = (int) (Math.random() * (Integer.MAX_VALUE - 1));
         final Account account = new Account();
