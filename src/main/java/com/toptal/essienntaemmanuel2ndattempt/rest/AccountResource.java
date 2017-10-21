@@ -6,7 +6,7 @@ import com.toptal.essienntaemmanuel2ndattempt.dto.AccountDto;
 import com.toptal.essienntaemmanuel2ndattempt.exception.GenericException;
 import com.toptal.essienntaemmanuel2ndattempt.exception.NoSuchAccountException;
 import com.toptal.essienntaemmanuel2ndattempt.service.api.AccountService;
-import com.toptal.essienntaemmanuel2ndattempt.service.impl.MailSender2;
+import com.toptal.essienntaemmanuel2ndattempt.service.api.MailSender;
 import com.toptal.essienntaemmanuel2ndattempt.util.AuthorityUtil;
 import com.toptal.essienntaemmanuel2ndattempt.util.WebUtil;
 import java.math.BigDecimal;
@@ -49,9 +49,9 @@ public class AccountResource {
     private MapperFacade mapperFacade;
 
     private final AccountService accountService;
-    private final MailSender2 mailSender;
+    private final MailSender mailSender;
 
-    public AccountResource(AccountService accountService, MailSender2 mailSender) {
+    public AccountResource(AccountService accountService, MailSender mailSender) {
         this.accountService = accountService;
         this.mailSender = mailSender;
     }
