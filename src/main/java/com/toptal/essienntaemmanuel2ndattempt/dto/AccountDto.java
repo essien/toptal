@@ -72,4 +72,10 @@ public class AccountDto implements Serializable {
     public void setSettings(SettingsDto settings) {
         this.settings = settings;
     }
+
+    @Override
+    public String toString() {
+        return "AccountDto{" + "email=" + email + ", password=" + password + ", verified=" + verified + ", roles=" + roles
+                + ", settings=" + settings + '}';
+    }
 }

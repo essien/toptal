@@ -38,6 +38,7 @@ public class AccountAuthProvider extends DaoAuthenticationProvider {
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
+        log.debug("Authenticating " + authentication);
         String email = authentication.getName();
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth != null) {
@@ -49,6 +50,8 @@ public class AccountAuthProvider extends DaoAuthenticationProvider {
 
             Account account = accountService.findByEmail(email).orElseThrow(() -> new AuthenticationException(INVALID_CREDENTIALS) {
             });
+
+            log.debug("Account exists " + email);
 
             List<String> roles = account.getRoles().stream().map(Role::getName).collect(Collectors.toList());
             if (roles.contains(Role.ADMIN) || roles.contains(Role.USER_MANAGER))
