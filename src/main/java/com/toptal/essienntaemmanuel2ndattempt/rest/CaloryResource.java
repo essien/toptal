@@ -6,10 +6,9 @@ import com.toptal.essienntaemmanuel2ndattempt.dto.CaloryDto;
 import com.toptal.essienntaemmanuel2ndattempt.exception.MealNotFoundException;
 import com.toptal.essienntaemmanuel2ndattempt.exception.NoSuchAccountException;
 import com.toptal.essienntaemmanuel2ndattempt.nutritionix.client.CaloriesClient;
-import com.toptal.essienntaemmanuel2ndattempt.service.impl.CaloryService;
+import com.toptal.essienntaemmanuel2ndattempt.service.api.CaloryService;
 import com.toptal.essienntaemmanuel2ndattempt.util.AuthorityUtil;
 import com.toptal.essienntaemmanuel2ndattempt.util.WebUtil;
-import java.math.BigDecimal;
 import java.net.URI;
 import java.security.Principal;
 import java.util.List;
@@ -48,13 +47,12 @@ public class CaloryResource {
     @Autowired
     private MapperFacade mapperFacade;
 
-    @Autowired
-    private CaloriesClient caloriesClient;
-
     private final CaloryService caloryService;
+    private final CaloriesClient caloriesClient;
 
-    public CaloryResource(CaloryService caloryService) {
+    public CaloryResource(CaloryService caloryService, CaloriesClient caloriesClient) {
         this.caloryService = caloryService;
+        this.caloriesClient = caloriesClient;
     }
 
     /**
