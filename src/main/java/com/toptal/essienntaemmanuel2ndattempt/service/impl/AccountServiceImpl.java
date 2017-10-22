@@ -97,7 +97,7 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public List<Account> findAll(int offset, int size) {
-        return accountRepository.findAccountsBy(new PageRequestImpl(offset, size, Sort.Direction.ASC, "id"));
+        return accountRepository.findAccountsBy(new PageRequestImpl(offset, size, Sort.Direction.DESC, "id"));
     }
 
     @Override
